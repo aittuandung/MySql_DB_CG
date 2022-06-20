@@ -86,7 +86,7 @@ select * from Test2.Marks
 order by Marks.Mark desc;
 
 alter table Test2.Subjects 
-	modify column SubjectName nvarchar(10000) not null;
+modify column SubjectName nvarchar(10000) not null;
     
 alter table Test2.Students 
 add constraint check(Age>15 and Age <50);
@@ -94,7 +94,6 @@ add constraint check(Age>15 and Age <50);
 alter table Test2.Marks
 drop constraint SubjectID,
 drop constraint	StudentID;
-    
 alter table Test2.ClassStudent
 drop constraint StudentID,
 drop constraint ClassID;
