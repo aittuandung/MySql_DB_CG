@@ -1,172 +1,130 @@
-CREATE DATABASE QL_DIEM_HV;
-USE QL_DIEM_HV;
-
-CREATE TABLE Test (
-    TestID INT PRIMARY KEY,
-    NameTest VARCHAR(255)
-);
-CREATE TABLE Student (
-    RN INT PRIMARY KEY,
-    Name VARCHAR(60),
-    age INT,
-    status VARCHAR(255)
+create DATABASE QL_HV;
+use QL_HV;
+create table test(
+testid int not null primary key,
+Subtestname varchar(60)
 );
 
-CREATE TABLE StudentTest (
-    RN INT,
-    TestID INT,
-    date DATE,
-    Mark DOUBLE,
-    FOREIGN KEY (RN)
-        REFERENCES Student (RN),
-    FOREIGN KEY (TestID)
-        REFERENCES Test (TestID)
+create table student(
+RN int not null primary key,
+Name varchar(50) not null,
+Age int(4)
 );
 
-insert into Student values 
-(1,'Nguyen Hong Ha',20, null),
-(2,'Truong Ngoc Anh',30,null),
-(3, 'Tuan Minh',25,null),
-(4,'Dan Truong',22,null);
+create table studenttest(
+testid int, foreign key (testid) references test(testid),
+RN int, foreign key (RN) references student(RN),
+Date datetime,
+mark float,
+primary key(testid,RN)
+);
 
-insert into Test values 
-(1,'EPC'),
-(2,'DWMX'),
-(3,'SQL1'),
-(4,'SQL2');
+insert into test value(1,'EPC'),(2,'DWMX'),(3,'SQL1'),(4,'SQL2');
 
-insert into StudentTest values
-(1,1,'2006/7/17',8),
-(1,2,'2006/7/18',5),
-(1,3,'2006/7/19',7),
-(2,1,'2006/7/17',7),
-(2,2,'2006/7/18',4),
-(2,3,'2006/7/19',2),
-(3,1,'2006/7/17',10),
-(3,3,'2006/7/18',1);
+insert into student value(1,'Nguyen Hong Ha',20),(2,'Truong Ngoc Anh',30),
+(3,'Tuan Minh',25),(4,'Dan Truong',22);
 
--- câu 2
-SELECT 
-    student.Name AS 'Student name',
-    Test.nameTest AS 'Test Name',
-    sdt.Mark,
-    sdt.date
-FROM
-    student
-        JOIN
-    studenttest AS `sdt` ON sdt.RN = student.RN
-        JOIN
-    Test ON Test.TestID = sdt.TestID;
+insert into studenttest value(1,1,'2006-07-17',8),(1,2,'2006-07-18',5),(1,3,'2006-07-19',7),
+(2,1,'2006-07-17',7),(2,2,'2006-07-18',4),(2,3,'2006-07-19',2),(3,1,'2006-07-17',10)
+,(3,3,'2006-07-19',1);
 
--- câu 3
-SELECT 
-    student.RN AS 'Student RN',
-    student.name AS 'Student Name',
-    student.age
-FROM
-    student
-WHERE
-    RN NOT IN (SELECT 
-            RN
-        FROM
-            studenttest);
-
--- câu 4
-SELECT 
-    student.Name AS 'Student name',
-    Test.nameTest AS 'Test Name',
-    sdt.Mark,
-    sdt.date
-FROM
-    student
-        JOIN
-    studenttest AS `sdt` ON sdt.RN = student.RN
-        JOIN
-    Test ON Test.TestID = sdt.TestID
-WHERE
-    sdt.mark < 5;
-
--- câu 5
-select name,avg(mark) from student
-join studenttest as `sdt` on sdt.RN=student.RN
-group by student.name
-order by avg(mark) desc;
-
--- câu 6
-create view diemtb as select name,avg(mark) as avgmark from student
-join studenttest as `sdt` on sdt.RN=student.RN
-group by student.name
-order by avg(mark) desc;
-select name,max(avgmark) from diemtb;
-
-
--- câu 7: 
-select nameTest,max(mark) from 
-studenttest as `stdt` 
-join test on stdt.testID=test.testid
-group by nameTest
-order by nameTest;
-
--- câu 8
-select name as `Student name`,nameTest as `Test Name` 
+-- câu 2:
+create view allStudent as
+select student.name as 'Student Name', test.Subtestname as 'Test Name', studenttest.mark, studenttest.date
+from student join studenttest on studenttest.RN = student.RN 
+			 join test on test.testid = studenttest.testid;
+             
+-- Câu 3:
+select * 
 from student 
-join StudentTest as `stdt` on Student.RN=stdt.RN
-join Test on stdt.TestID=Test.TestID;
+where not exists (select * from studenttest where studenttest.RN = student.RN);
 
--- câu 9
-update student set age = age + 1
-where RN > 0;
+select student.*
+from student left join studenttest on studenttest.RN = student.RN 
+where mark is null;
 
--- câu 10
-alter table student add column status varchar(255);
+-- Câu 4:
+select *
+from allStudent
+where mark < 5;
 
--- câu 11
-create index ageIndex on student(age);
-update student 
-set status= 'Young'
-where age < 30;
+-- Câu 5:
+select student.name as 'Student Name', avg(mark) as 'Điểm Trung Bình'
+from student join studenttest on studenttest.RN = student.RN 
+group by student.name
+order by `Điểm Trung Bình` desc;
 
-update student
-set status='old'
-where age >= 30;
+-- Câu 6: 
+select student.name as 'Student Name', avg(mark) as 'Điểm Trung Bình'
+from student join studenttest on studenttest.RN = student.RN 
+group by student.name
+order by `Điểm Trung Bình` desc
+limit 1;
 
--- câu 12
-create view vwStudentTestList as (
-select name,nameTest,mark,date from student 
-join studenttest as `stdt` on stdt.RN=student.RN
-join test on test.TestID= stdt.TestID
-);
-select * from vwStudentTestList;
+-- Câu 7:
+select test.Subtestname as 'Tên môn học', max(studenttest.mark) as 'Điểm cao nhất'
+from studenttest join test on test.testid = studenttest.testid
+group by test.Subtestname
+order by test.Subtestname;
 
--- câu 13
-DELIMITER //  
-CREATE TRIGGER	tgSetStatus
-AFTER UPDATE
-ON Student FOR EACH ROW
+-- Câu 8:
+select student.name as 'Student Name',if(test.Subtestname is null,'chưa học môn nào', test.Subtestname) as 'Tên Môn Học'
+from student left join studenttest on studenttest.RN = student.RN 
+			 left join test on test.testid = studenttest.testid;
+             
+-- Câu 9:
+update student set age = age + 1 where RN > 0; 
+
+-- Câu 10;
+alter table student add status varchar(10);
+
+-- Câu 11:
+update student set status = if(age < 30, 'Young','old') where RN > 0; 
+
+-- Câu 12:
+create view allStudent as
+select student.name as 'Student Name', test.Subtestname as 'Test Name', studenttest.mark, studenttest.date
+from student join studenttest on studenttest.RN = student.RN 
+			 join test on test.testid = studenttest.testid;
+        
+-- Câu 13:
+DELIMITER $$
+CREATE TRIGGER tgSetStatus 
+ before UPDATE on student
+ FOR EACH ROW
 BEGIN
-IF Student.age < 30 THEN SET Student.status = 'Young';
-END IF;
-IF Student.age >= 30 THEN SET Student.status = 'Old';
-END IF;
-END//
+	set new.status = if(new.age < 30, 'Young','old'); 
+END
+$$
 
-UPDATE Student set age = 21 WHERE id = '1';
+-- Câu 14:
+CREATE VIEW view1 as
+SELECT s.Name ,t.Subtestname ,st.mark
+FROM student as s 
+		LEFT JOIN studenttest as st on s.RN=st.RN 
+        LEFT JOIN test as t on st.testid =t.testid;
 
-select * from Student;
+drop procedure spViewStatus;
+DELIMITER $$
+CREATE procedure spViewStatus(IN nameHV varchar(50), IN nameMH varchar(50),OUT output1 varchar(50),out output2 float)
+BEGIN
+DECLARE diem float;
+	if nameHV not in (select Name from student) or nameMH not in(select Subtestname from test) then
+		set output1='Khong tìm thấy';
+	else
+		SELECT Mark INTO diem FROM view1 WHERE view1.Name=nameHV and view1.Subtestname=nameMH;
+            set output2=diem;
+ 			IF diem>=5 then
+				SET output1='Đỗ';
+			ELSEIF diem<5 then
+				SET output1='Trượt';
+			ELSE
+				SET output1='Chưa thi';
+			end if;
+	end if;
+END$$
 
--- câu 14
-DELIMITER //
-create procedure spViewStatus(IN vl1 VARCHAR(60), vl2 VARCHAR(255), OUT vl1Out VARCHAR(60), vl2Out VARCHAR(255))
-   begin
-   IF (SELECT Name FROM Student WHERE vl1 [NOT] EXISTS(select Name from Student)) or (SELECT NameTest FROM Test WHERE vl2 [not] EXISTS(select NameTest from Test)) then set vl1Out = 'Khong tim thay';
-   end if;
-   if (SELECT Mark FROM Test WHERE vl1 = null ) then set vl1Out = 'Chua thi';
-   end if;
-   if (SELECT Mark FROM Test WHERE vl1 >= 5 ) then set vl1Out = 'Do';
-   end if;
-   if (SELECT Mark FROM Test WHERE vl1 < 5 ) then set vl1Out = 'Truot';
-   end if;
-   end;
-//delimiter ;
 
+call spViewStatus('Nguyen Hong Ha','SQL1',@a,@b);
 
+select @a as 'trạng thái' , @b as 'Điểm thi';
