@@ -50,46 +50,46 @@ CREATE TABLE CTHD (
 );
                         
 -- câu 1:
-seleCT count(distinCT CT.MASP) 
-from HOADON HD join CTHD CT on HD.SOHD = CT.SOHD 
-where year(HD.nghd) = 2006  ;
+SELECT count(distinCT CT.MASP) 
+FROM HOADON HD JOIN CTHD CT ON HD.SOHD = CT.SOHD 
+WHERE year(HD.nghd) = 2006  ;
 
 -- câu 2:
-seleCT max(HOADON.TRIGIA), min(HOADON.TRIGIA) 
-from HOADON; 
+SELECT max(HOADON.TRIGIA), min(HOADON.TRIGIA) 
+FROM HOADON; 
 
 -- câu 3:
-seleCT avg(HOADON.TRIGIA) 
-from HOADON
-where year(HOADON.NGHD) = 2006 ;
+SELECT avg(HOADON.TRIGIA) 
+FROM HOADON
+WHERE year(HOADON.NGHD) = 2006 ;
 
 -- câu 4:
-seleCT sum(HOADON.TRIGIA) 
-from HOADON
-where year(HOADON.NGHD) = 2006 ;
+SELECT sum(HOADON.TRIGIA) 
+FROM HOADON
+WHERE year(HOADON.NGHD) = 2006 ;
 
 -- câu 5:
-seleCT max(HOADON.TRIGIA) 
-from HOADON
-where year(NGHD) = 2006; 
+SELECT max(HOADON.TRIGIA) 
+FROM HOADON
+WHERE year(NGHD) = 2006; 
 
 -- câu 6:
-seleCT KH.hoten, max(HD.TRIGIA)
-from KHACHHANG KH join HOADON HD on KH.MAKH = hd.MAKH
-where year(NGHD) = 2006;
+SELECT KH.hoten, max(HD.TRIGIA)
+FROM KHACHHANG KH JOIN HOADON HD ON KH.MAKH = hd.MAKH
+WHERE year(NGHD) = 2006;
 
 -- câu 7:
-seleCT KH.MAKH,KH.hoten
-from KHACHHANG kh
-order by kh.doanhso desc
+SELECT KH.MAKH,KH.hoten
+FROM KHACHHANG kh
+ORDER BY kh.doanhso desc
 limit 3;
 
 -- câu 8:
-seleCT MASP, TENSP, GIA
-from SANPHAM
-where GIA >= (
-seleCT distinCT GIA from SANPHAM
-order by GIA desc
+SELECT MASP, TENSP, GIA
+FROM SANPHAM
+WHERE GIA >= (
+SELECT distinCT GIA FROM SANPHAM
+ORDER BY GIA desc
 limit 2,1
 );
 
@@ -108,71 +108,71 @@ WHERE
         LIMIT 2 , 1);
         
 -- câu 10: 
-seleCT MASP, TENSP, GIA
-from SANPHAM
-where NUOCSX like 'Trung Quoc' and GIA >= (
-seleCT distinCT GIA from SANPHAM
-order by GIA desc
+SELECT MASP, TENSP, GIA
+FROM SANPHAM
+WHERE NUOCSX LIKE 'Trung Quoc' and GIA >= (
+SELECT distinCT GIA FROM SANPHAM
+ORDER BY GIA desc
 limit 2,1
 );
 
 -- câu 11:
-SeleCT *, rank() over(order by doanhso DESC) as ranking from KHACHHANG;
+SELECT *, rank() over(ORDER BY doanhso DESC) as ranking FROM KHACHHANG;
 
 -- câu 12:
-seleCT count(MASP) 'Trung Quoc' 
-from SANPHAM
-where NUOCSX like 'Trung Quoc';
+SELECT count(MASP) 'Trung Quoc' 
+FROM SANPHAM
+WHERE NUOCSX LIKE 'Trung Quoc';
 
 -- câu 13:
-seleCT NUOCSX, count(MASP) 
-from SANPHAM
-group by NUOCSX;
+SELECT NUOCSX, count(MASP) 
+FROM SANPHAM
+GROUP BY NUOCSX;
 
 -- câu 14:
-seleCT NUOCSX , min(GIA) , max(GIA) , avg(GIA)  
-from SANPHAM
-group by NUOCSX;
+SELECT NUOCSX , min(GIA) , max(GIA) , avg(GIA)  
+FROM SANPHAM
+GROUP BY NUOCSX;
 
 -- câu 15:
-seleCT NGHD , sum(TRIGIA)
-from HOADON
-group by NGHD
-order by NGHD;
+SELECT NGHD , sum(TRIGIA)
+FROM HOADON
+GROUP BY NGHD
+ORDER BY NGHD;
 
 -- câu 16:
-seleCT count(CTHD.sl) 
-from CTHD join HOADON on HOADON.SOHD = CTHD.SOHD
-where month(NGHD) = 10 and year(NGHD) = 2006;
+SELECT count(CTHD.sl) 
+FROM CTHD JOIN HOADON ON HOADON.SOHD = CTHD.SOHD
+WHERE mONth(NGHD) = 10 and year(NGHD) = 2006;
 
 -- câu 17:
-seleCT month(NGHD) , sum(TRIGIA) 
-from HOADON
-where year(NGHD) = 2006
-group by month(NGHD)
-order by month(NGHD);
+SELECT mONth(NGHD) , sum(TRIGIA) 
+FROM HOADON
+WHERE year(NGHD) = 2006
+GROUP BY mONth(NGHD)
+ORDER BY mONth(NGHD);
 
 -- câu 18:
-seleCT HOADON.SOHD , count(CTHD.MASP) 
-from HOADON join CTHD on CTHD.SOHD = HOADON.SOHD
-group by HOADON.SOHD
+SELECT HOADON.SOHD , count(CTHD.MASP) 
+FROM HOADON JOIN CTHD ON CTHD.SOHD = HOADON.SOHD
+GROUP BY HOADON.SOHD
 having count(CTHD.MASP) = 3 ;
 
 -- câu 19:
-seleCT HOADON.SOHD , count(CTHD.MASP) 
-from HOADON join CTHD on CTHD.SOHD = HOADON.SOHD join SANPHAM on SANPHAM.MASP = CTHD.MASP
-where SANPHAM.NUOCSX = 'việt nam'
-group by HOADON.SOHD
+SELECT HOADON.SOHD , count(CTHD.MASP) 
+FROM HOADON JOIN CTHD ON CTHD.SOHD = HOADON.SOHD JOIN SANPHAM ON SANPHAM.MASP = CTHD.MASP
+WHERE SANPHAM.NUOCSX = 'việt nam'
+GROUP BY HOADON.SOHD
 having count(CTHD.MASP) = 3 ;
 
 -- câu 20:
-seleCT KHACHHANG.MAKH, KHACHHANG.hoten,count(HOADON.SOHD)
-from KHACHHANG join HOADON on HOADON.MAKH = KHACHHANG.MAKH
-group by KHACHHANG.MAKH
+SELECT KHACHHANG.MAKH, KHACHHANG.hoten,count(HOADON.SOHD)
+FROM KHACHHANG JOIN HOADON ON HOADON.MAKH = KHACHHANG.MAKH
+GROUP BY KHACHHANG.MAKH
 having count(HOADON.SOHD) = (
-seleCT count(SOHD)
-from HOADON
-group by MAKH
-order by count(SOHD) desc
+SELECT count(SOHD)
+FROM HOADON
+GROUP BY MAKH
+ORDER BY count(SOHD) desc
 limit 1
 );
